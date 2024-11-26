@@ -13,6 +13,8 @@ public class PuzzleManager : MonoBehaviour
     public Transform containerParent; // Parent qui contient les containers
     public List<Block> blocks;
     public int gridSize;
+    public GameObject GameInfoPanel;
+    public TMP_Text GameInfoText;
 
     public int numberOfAttempts = 5; // Nombre de tentatives (lignes)
     public int blockLength = 4; // Longueur des blocs dans chaque ligne
@@ -29,7 +31,8 @@ public class PuzzleManager : MonoBehaviour
     {
         GenerateGrid(gridSize);
         GeneratePuzzle(numberOfAttempts, blockLength);
-        
+        GameInfoPanel.SetActive(false);
+
         CurrentSolution = new string[blockLength];
     }
 
@@ -40,18 +43,23 @@ public class PuzzleManager : MonoBehaviour
         if (CurrentSolution.SequenceEqual(puzzleSolution))
         {
             Debug.Log("Puzzle résolu !");
-            // Reset the puzzle
-            currentAttempt = 0;
-            currentNumberOfBlocksOnContainer = 0;
-            CurrentSolution = new string[blockLength];
-            GeneratePuzzle(numberOfAttempts, blockLength);
-            GenerateGrid(gridSize);
+            GameInfoPanel.SetActive(true);
+            GameInfoText.text = "Puzzle résolu !";
+            GameInfoText.color = Color.green;
         }
         else if (currentNumberOfBlocksOnContainer == blockLength)
         {
             Debug.Log("Puzzle non résolu !");
             //Set Color red no exist in the solution and yellow exist in the solution but in the wrong place and green exist in the solution and in the right place
-
+            if (currentAttempt +1  == numberOfAttempts)
+            {
+                Debug.Log("Puzzle non résolu !");
+                // Reset the puzzle
+                GameInfoPanel.SetActive(true);
+                GameInfoText.text = "Puzzle non résolu !";
+                GameInfoText.color = Color.red;
+                return;
+            }
             for (int i = 0; i < blockLength; i++)
             {
                 if (puzzleSolution[i] == CurrentSolution[i])
@@ -140,8 +148,18 @@ public class PuzzleManager : MonoBehaviour
             }
 
         }
+
     }
 
+    public void ResetPuzzle()
+    {
+        currentAttempt = 0;
+        currentNumberOfBlocksOnContainer = 0;
+        CurrentSolution = new string[blockLength];
+        GeneratePuzzle(numberOfAttempts, blockLength);
+        GenerateGrid(gridSize);
+        GameInfoPanel.SetActive(false);
+    }
 
     public void GenerateGrid(int numberOfBlocks)
     {
@@ -225,13 +243,6 @@ public class PuzzleManager : MonoBehaviour
             // Check if currentAttempt and currentNumberOfBlocksOnContainer are within bounds
             if (currentAttempt < blockContainers.Count && currentNumberOfBlocksOnContainer < blockContainers[currentAttempt].Count)
             {
-                /*                //move to the BlockContainer
-                                blockContainers[currentAttempt][currentNumberOfBlocksOnContainer].ContainBlock = block;
-                                block.transform.SetParent(blockContainers[currentAttempt][currentNumberOfBlocksOnContainer].transform);
-                                block.transform.localPosition = Vector3.zero;
-                                block.transform.localScale = Vector3.one;
-                                currentNumberOfBlocksOnContainer++;
-                                block.isLocked = true;*/
                 //Instantiate a new copy of the block container in the grid
                 Block blockCopy = Instantiate(blockPrefab, blockContainers[currentAttempt][currentNumberOfBlocksOnContainer].transform).GetComponent<Block>();
                 blockContainers[currentAttempt][currentNumberOfBlocksOnContainer].ContainBlock = blockCopy;
