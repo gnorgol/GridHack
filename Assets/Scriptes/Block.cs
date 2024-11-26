@@ -5,33 +5,18 @@ public class Block : MonoBehaviour
 {
     public int blockValue;
     public bool isLocked;
-    public Color activeColor;
-    public Color lockedColor;
-    private Image blockImage;
 
-    private void Start()
+
+    public void Lock()
     {
-        blockImage = GetComponent<Image>();
-        UpdateBlockAppearance();
+        isLocked = true;
+        GetComponent<Image>().color = Color.gray;
+    }
+    public void Unlock() {
+        isLocked = false;
+        GetComponent<Image>().color = Color.white;
     }
 
-    public void ToggleLock()
-    {
-        isLocked = !isLocked;
-        UpdateBlockAppearance();
-    }
 
-    public void UpdateBlockAppearance()
-    {
-        blockImage.color = isLocked ? lockedColor : activeColor;
-    }
 
-    public void OnBlockClicked()
-    {
-        if (!isLocked)
-        {
-            // Logique pour déplacer le bloc ou effectuer une action
-            
-        }
-    }
 }
